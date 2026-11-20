@@ -1,0 +1,31 @@
+# Phase 0 smoke flow: the app boots and shows the five tabs. Runs on Android and iOS.
+# __APP_ID__ is replaced with the bundle id by CI (see .github/workflows/ios-smoke.yml),
+# so the product rename stays a one-line change in .env / app.config.ts.
+appId: __APP_ID__
+---
+- launchApp:
+    clearState: true
+- assertVisible: 'Today'
+- takeScreenshot: 01-today
+- assertVisible:
+    id: 'screen-today'
+
+- tapOn: 'Browse'
+- assertVisible:
+    id: 'screen-browse'
+- takeScreenshot: 02-browse
+
+- tapOn: 'Calendar'
+- assertVisible:
+    id: 'screen-calendar'
+- takeScreenshot: 03-calendar
+
+- tapOn: 'Progress'
+- assertVisible:
+    id: 'screen-progress'
+- takeScreenshot: 04-progress
+
+- tapOn: 'Assistant'
+- assertVisible:
+    id: 'screen-assistant'
+- takeScreenshot: 05-assistant
