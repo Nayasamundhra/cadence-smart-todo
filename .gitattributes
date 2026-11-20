@@ -1,0 +1,8 @@
+# Always LF so Prettier, shell scripts and CI behave the same on Windows, macOS and Linux.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.ttf binary
+*.otf binary
