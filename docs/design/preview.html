@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cadence — Design Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{
+  --bg:#F7F6F2;--surface:#FFFFFF;--surfaceAlt:#F0EEE8;--border:#E4E1D8;--borderStrong:#CFCBBF;
+  --text:#1B1B18;--text2:#5E5C55;--text3:#737067;--accent:#1F6F5C;--onAccent:#FFFFFF;--accentSoft:#E3F0EC;
+  --danger:#B93636;--dangerSoft:#F8E7E5;--warning:#9C5606;--info:#2A62B3;--success:#27724A;
+  --p0:#CFCBBF;--p1:#6E6B62;--p2:#2A62B3;--p3:#9C5606;--p4:#B93636;
+  --teal:#1F7A7A;--plum:#8A4A9E;--moss:#4E7D4A;--amber:#9A6508;--page:#E9E7E0;
+  --float:0 6px 16px rgba(0,0,0,.12);
+}
+[data-theme="dark"]{
+  --bg:#111210;--surface:#1A1B18;--surfaceAlt:#232420;--border:#2E2F2A;--borderStrong:#42433D;
+  --text:#F2F1EC;--text2:#A9A79E;--text3:#8F8D84;--accent:#5FC2A6;--onAccent:#0C1F1A;--accentSoft:#17302A;
+  --danger:#EF7A74;--dangerSoft:#3A1F1D;--warning:#E5A04A;--info:#7FB0F0;--success:#6CC48D;
+  --p0:#42433D;--p1:#8F8D84;--p2:#7FB0F0;--p3:#E5A04A;--p4:#EF7A74;
+  --teal:#6CC7C7;--plum:#CE9BE0;--moss:#8DBF88;--amber:#E3B25C;--page:#050505;
+  --float:0 6px 16px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--page);color:var(--text);padding:32px 16px 64px;-webkit-font-smoothing:antialiased}
+.top{max-width:1160px;margin:0 auto 28px;display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap}
+.top h1{font-family:"Instrument Serif",serif;font-weight:400;font-size:34px;line-height:40px}
+.top p{color:var(--text2);font-size:14px;line-height:20px;max-width:560px;margin-top:4px}
+.toggle{border:1px solid var(--borderStrong);background:var(--surface);color:var(--text);font:500 14px Inter;padding:10px 16px;border-radius:12px;cursor:pointer}
+.swatches{max-width:1160px;margin:0 auto 32px;display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:86px;font-size:11px;color:var(--text2)}
+.sw i{display:block;height:36px;border-radius:8px;border:1px solid var(--border);margin-bottom:4px}
+.grid{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:32px 24px;justify-items:center}
+figure{width:340px}
+figcaption{font-size:13px;color:var(--text2);margin-bottom:10px;font-weight:500}
+.phone{width:340px;height:700px;background:var(--bg);border:1px solid var(--border);border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.status{height:36px;flex:none}
+.body{flex:1;overflow:hidden;padding:0 20px}
+.row{display:flex;align-items:center;gap:12px}
+.between{justify-content:space-between}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--accentSoft);color:var(--accent);font:600 13px Inter;display:grid;place-items:center}
+.ico{width:22px;height:22px;stroke:var(--text2);fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.display{font-family:"Instrument Serif",serif;font-size:34px;line-height:40px;margin-top:16px}
+.cap{font-size:13px;line-height:18px;color:var(--text2)}
+.over{font:600 12px/16px Inter;letter-spacing:.6px;text-transform:uppercase;color:var(--text2);margin:24px 0 8px;display:flex;justify-content:space-between}
+.task{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);margin-left:0}
+.task:last-child{border-bottom:0}
+.cb{width:22px;height:22px;border-radius:50%;border:2px solid var(--p0);flex:none;margin-top:1px}
+.cb.p2{border-color:var(--p2)}.cb.p3{border-color:var(--p3)}.cb.p4{border-color:var(--p4)}
+.cb.done{background:var(--p1);border-color:var(--p1)}
+.tt{font-size:16px;line-height:24px}
+.meta{font-size:13px;line-height:18px;color:var(--text2);display:flex;gap:8px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.red{color:var(--danger)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px}
+.sugg{background:var(--accentSoft);border-radius:16px;padding:14px 16px;margin-top:16px;display:flex;gap:10px;align-items:flex-start}
+.sugg b{font-weight:500;font-size:14px;line-height:20px;display:block}
+.sugg a{color:var(--accent);font:600 14px Inter;display:inline-block;margin-top:6px}
+.spark{width:16px;height:16px;fill:var(--accent);flex:none;margin-top:2px}
+.fab{position:absolute;right:20px;bottom:76px;width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--onAccent);display:grid;place-items:center;font-size:28px;font-weight:300;box-shadow:var(--float)}
+.tabs{height:60px;flex:none;border-top:1px solid var(--border);background:var(--surface);display:flex;justify-content:space-around;align-items:center;font-size:11px;color:var(--text3)}
+.tabs span{display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabs .on{color:var(--accent);font-weight:600}
+.tabs i{width:20px;height:20px;border-radius:6px;border:1.75px solid currentColor;display:block}
+.chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;background:var(--surfaceAlt);font-size:13px;color:var(--text2);white-space:nowrap}
+.chip.sel{background:var(--accentSoft);color:var(--accent);font-weight:500}
+.overlay{position:absolute;inset:0;background:rgba(20,20,18,.4)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:24px 24px 0 0;padding:10px 20px 20px;box-shadow:var(--float)}
+.grab{width:36px;height:4px;border-radius:2px;background:var(--borderStrong);margin:0 auto 16px}
+.kbd{height:210px;margin:16px -20px -20px;background:var(--surfaceAlt);display:grid;place-items:center;color:var(--text3);font-size:12px}
+u{text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:4px}
+.send{width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--onAccent);display:grid;place-items:center;flex:none}
+.prop{display:flex;gap:12px;align-items:center;min-height:44px;font-size:15px;border-bottom:1px solid var(--border)}
+.prop span:first-child{color:var(--text2);width:84px;font-size:14px}
+h2{font:600 24px/30px Inter;margin-top:12px}
+h3{font:600 17px/24px Inter}
+.btn{height:52px;border-radius:12px;background:var(--accent);color:var(--onAccent);font:500 16px Inter;display:grid;place-items:center}
+.btn.ghost{background:none;color:var(--text2)}
+.pi{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.pi:last-child{border-bottom:0}
+.sq{width:20px;height:20px;border-radius:6px;border:2px solid var(--borderStrong);flex:none;margin-top:2px}
+.sq.on{background:var(--accent);border-color:var(--accent)}
+.diff{font-size:13px;line-height:18px;color:var(--text2)}
+.diff b{color:var(--text);font-weight:500}
+.dangerbox{background:var(--dangerSoft);border-radius:16px;padding:4px 16px;margin-top:12px}
+.seg{display:flex;background:var(--surfaceAlt);border-radius:8px;padding:3px;margin-top:16px;font-size:14px}
+.seg span{flex:1;text-align:center;padding:6px 0;border-radius:6px;color:var(--text2)}
+.seg .on{background:var(--surface);color:var(--text);font-weight:500}
+.habit{display:flex;align-items:center;gap:12px;margin-top:12px}
+.hic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none}
+.days{display:flex;gap:4px;margin-top:6px}
+.days i{width:10px;height:10px;border-radius:3px;background:var(--surfaceAlt)}
+.check{width:44px;height:44px;border-radius:50%;border:2px solid var(--borderStrong);margin-left:auto;display:grid;place-items:center;flex:none;color:var(--onAccent);font-weight:600}
+.bubble{background:var(--accent);color:var(--onAccent);padding:10px 14px;border-radius:16px 16px 4px 16px;font-size:15px;line-height:22px;margin:16px 0 16px 56px}
+.ai{font-size:15px;line-height:23px;display:flex;gap:8px}
+.lrow{display:flex;align-items:center;gap:12px;min-height:46px;border-bottom:1px solid var(--border);font-size:16px}
+.lrow:last-child{border-bottom:0}
+.lrow .n{margin-left:auto;color:var(--text3);font-size:14px;font-variant-numeric:tabular-nums}
+.ring{width:36px;height:36px;border-radius:50%;background:conic-gradient(var(--c,var(--accent)) calc(var(--v)*1%),var(--border) 0);display:grid;place-items:center;flex:none}
+.ring::after{content:attr(data-l);width:calc(100% - 8px);height:calc(100% - 8px);border-radius:50%;background:var(--bg);display:grid;place-items:center;font:600 10px Inter;color:var(--text)}
+.ring.s::after{background:var(--surface)}
+.ring.lg{width:120px;height:120px}.ring.lg::after{width:100px;height:100px;font-size:28px}
+.cols{display:flex;gap:12px;margin:16px -20px 0 0}
+.col{width:258px;flex:none;background:var(--surfaceAlt);border-radius:16px;padding:12px;align-self:flex-start}
+.kc{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--p0);border-radius:12px;padding:10px 12px;margin-top:8px;font-size:15px;line-height:21px}
+.kc.lift{box-shadow:var(--float);transform:rotate(-1.500deg) scale(1.020)}
+.ws{display:flex;justify-content:space-between;margin-top:14px;text-align:center;font-size:11px;color:var(--text3)}
+.ws b{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;font:500 15px Inter;color:var(--text);margin-top:4px}
+.ws .on b{background:var(--accent);color:var(--onAccent)}
+.tg{position:relative;margin-top:12px;border-top:1px solid var(--border)}
+.hr{height:56px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text3);padding-top:3px;font-variant-numeric:tabular-nums}
+.blk{position:absolute;left:44px;right:0;border-radius:8px;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 14%,var(--bg));padding:6px 10px;font-size:13px;line-height:17px;overflow:hidden}
+.blk small{display:block;color:var(--text2);font-size:11px}
+.blk.cf{background-image:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--warning) 35%,transparent) 6px 8px)}
+.now{position:absolute;left:36px;right:0;height:2px;background:var(--danger)}
+.now::before{content:"";position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--danger)}
+.drawer{position:absolute;left:0;right:0;bottom:60px;background:var(--surface);border-top:1px solid var(--border);border-radius:20px 20px 0 0;padding:8px 20px 12px;box-shadow:var(--float)}
+.pl{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+.pl:last-child{border-bottom:0}
+.pl time{width:42px;font:500 13px Inter;color:var(--text2);font-variant-numeric:tabular-nums;flex:none;padding-top:3px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.tiles .card{padding:12px 14px}
+.stat{font:600 28px/32px Inter;font-variant-numeric:tabular-nums;margin-top:2px}
+.up{color:var(--success);font-size:12px;font-weight:500}.down{color:var(--danger);font-size:12px;font-weight:500}
+.bars{display:flex;align-items:flex-end;gap:8px;height:84px;margin-top:12px}
+.bars span{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%;font-size:10px;color:var(--text3)}
+.bars i{width:100%;background:var(--accent);border-radius:4px 4px 0 0;display:block}
+.stack{display:flex;height:10px;gap:2px;margin-top:12px}
+.stack i{border-radius:3px;display:block}
+.hm{display:grid;grid-template-rows:repeat(7,12px);grid-auto-flow:column;grid-auto-columns:12px;gap:3px;margin-top:12px}
+.hm i{border-radius:3px;background:var(--surfaceAlt)}
+.swt{width:44px;height:26px;border-radius:13px;background:var(--borderStrong);position:relative;flex:none;margin-left:auto}
+.swt::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff}
+.swt.on{background:var(--accent)}.swt.on::after{left:21px}
+.sq.r{border-radius:50%}
+.pb{height:6px;border-radius:3px;background:var(--border);overflow:hidden;margin-top:8px}
+.pb i{display:block;height:100%;background:var(--accent)}
+.btn.sec{background:var(--surface);color:var(--text);border:1px solid var(--borderStrong)}
+.est{font-size:12px;color:var(--text2);background:var(--surfaceAlt);border-radius:999px;padding:2px 8px;margin-left:auto;white-space:nowrap;flex:none}
+.sect{max-width:1160px;margin:48px auto 20px;font:600 12px/16px Inter;letter-spacing:.6px;text-transform:uppercase;color:var(--text2);grid-column:1/-1;justify-self:start}
+.tok{background:var(--accentSoft);color:var(--accent);border-radius:6px;padding:2px 5px}
+.caret{display:inline-block;width:2px;height:22px;background:var(--accent);vertical-align:-4px;margin-left:2px}
+.chip.set{background:var(--surface);border:1px solid var(--borderStrong);color:var(--text);padding:0 10px;font-weight:500}
+.chip.set .ico{width:15px;height:15px;stroke:var(--text2)}
+.chip.set b{font-weight:400;color:var(--text3);font-size:11px;margin-left:2px}
+.ib{width:40px;height:40px;display:grid;place-items:center;border-radius:10px}
+.ib .ico{width:20px;height:20px}
+.kb{margin:12px -20px -20px;background:var(--surfaceAlt);padding:8px 3px 26px;display:grid;gap:8px}
+.kr{display:flex;justify-content:center;gap:5px}
+.kr i{width:28px;height:38px;border-radius:6px;background:var(--surface);display:grid;place-items:center;font:400 15px Inter;color:var(--text);box-shadow:0 1px 0 var(--borderStrong)}
+.kr i.w{width:44px;font-size:12px;color:var(--text2)}.kr i.sp{width:170px}
+.composer{position:absolute;left:16px;right:16px;bottom:72px;background:var(--surface);border:1px solid var(--borderStrong);border-radius:24px;padding:8px 8px 8px 16px;display:flex;align-items:center;gap:8px;color:var(--text3);font-size:15px}
+</style>
+</head>
+<body>
+<div class="top">
+  <div>
+    <h1>Cadence design preview</h1>
+    <p>Static reference for tokens, type and 17 key screens. Values match docs/02-design-system.md. Hand-written HTML approximating the React Native layouts; not pixel-final.</p>
+  </div>
+  <button class="toggle" onclick="var r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'">Switch light / dark</button>
+</div>
+
+<div class="swatches">
+  <div class="sw"><i style="background:var(--bg)"></i>bg</div>
+  <div class="sw"><i style="background:var(--surface)"></i>surface</div>
+  <div class="sw"><i style="background:var(--surfaceAlt)"></i>surfaceAlt</div>
+  <div class="sw"><i style="background:var(--borderStrong)"></i>borderStrong</div>
+  <div class="sw"><i style="background:var(--text)"></i>text</div>
+  <div class="sw"><i style="background:var(--text2)"></i>textSecondary</div>
+  <div class="sw"><i style="background:var(--accent)"></i>accent</div>
+  <div class="sw"><i style="background:var(--accentSoft)"></i>accentSoft</div>
+  <div class="sw"><i style="background:var(--p4)"></i>urgent / danger</div>
+  <div class="sw"><i style="background:var(--p3)"></i>high / warning</div>
+  <div class="sw"><i style="background:var(--p2)"></i>medium / info</div>
+  <div class="sw"><i style="background:var(--p1)"></i>low</div>
+</div>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+  <path id="sp" d="M8 0c.6 4.2 3.8 7.4 8 8-4.2.6-7.4 3.800-8 8-.6-4.200-3.800-7.400-8-8 4.200-.6 7.400-3.800 8-8z"/>
+</defs></svg>
+
+<div class="grid">
+
+<figure><figcaption>9 · Today</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body">
+    <div class="row between"><div class="avatar">NM</div>
+      <svg class="ico" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.300 21a1.940 1.940 0 0 0 3.400 0"/></svg></div>
+    <div class="display">Monday, 16 November</div>
+    <div class="cap">6 tasks · 2 habits · about 4 h planned</div>
+    <div class="sugg"><svg class="spark" viewBox="0 0 16 16"><use href="#sp"/></svg>
+      <div><b>You have 6 tasks and no plan yet.</b><a>Plan my day</a></div></div>
+    <div class="over"><span style="color:var(--danger)">Overdue · 1</span><span style="color:var(--accent);text-transform:none;letter-spacing:0">Reschedule</span></div>
+    <div class="task"><div class="cb p4"></div><div><div class="tt">Send invoice to Northwind</div><div class="meta"><span class="red">Overdue · Fri</span><span><i class="dot" style="background:var(--teal)"></i> Work</span></div></div></div>
+    <div class="over"><span>Today</span></div>
+    <div class="task"><div class="cb p3"></div><div><div class="tt">Submit project report</div><div class="meta"><span>17:00</span><span>2/5</span><span><i class="dot" style="background:var(--teal)"></i> Work</span></div></div></div>
+    <div class="task"><div class="cb p2"></div><div><div class="tt">Review chapter 4 notes</div><div class="meta"><span>Today</span><span><i class="dot" style="background:var(--plum)"></i> Study</span></div></div></div>
+    <div class="task"><div class="cb"></div><div><div class="tt">Book dentist appointment</div><div class="meta"><span>Today</span><span>errand</span></div></div></div>
+    <div class="task"><div class="cb done"></div><div><div class="tt" style="color:var(--text3);text-decoration:line-through">Morning run</div></div></div>
+  </div>
+  <div class="fab">+</div>
+  <div class="tabs"><span class="on"><i></i>Today</span><span><i></i>Browse</span><span><i></i>Calendar</span><span><i></i>Progress</span><span><i></i>Assistant</span></div>
+</div></figure>
+
+<figure><figcaption>14 · Quick add</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body">
+    <div class="row between"><div class="avatar">NM</div></div>
+    <div class="display">Monday, 16 November</div>
+    <div class="cap">6 tasks · 2 habits · about 4 h planned</div>
+    <div class="over"><span>Today</span></div>
+    <div class="task"><div class="cb p3"></div><div><div class="tt">Submit project report</div></div></div>
+    <div class="task"><div class="cb p2"></div><div><div class="tt">Review chapter 4 notes</div></div></div>
+  </div>
+  <div class="overlay"></div>
+  <div class="sheet" style="padding-top:8px"><div class="grab" style="margin-bottom:12px"></div>
+    <div class="row between">
+      <span class="chip" style="height:28px;background:none;border:1px solid var(--border);padding:0 10px"><i class="dot" style="background:var(--teal)"></i>Work <span style="color:var(--text3)">▾</span></span>
+      <svg class="ico" style="width:18px;height:18px" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+    </div>
+    <div style="font-size:19px;line-height:30px;margin-top:12px;font-weight:500">Submit project report <span class="tok">next Friday 5pm</span> <span class="tok">!3</span> <span class="tok">#Work</span><span class="caret"></span></div>
+    <div class="cap" style="color:var(--text3);margin-top:4px;font-size:14px">Add notes</div>
+    <div class="row" style="gap:6px;margin-top:14px;flex-wrap:wrap">
+      <span class="chip set"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Fri 27 Nov, 17:00<b>✕</b></span>
+      <span class="chip set" style="color:var(--p3)"><svg class="ico" style="stroke:var(--p3)" viewBox="0 0 24 24"><path d="M5 21V4h12l-2 4 2 4H5"/></svg>High<b>✕</b></span>
+    </div>
+    <div class="row between" style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
+      <div class="row" style="gap:2px;margin-left:-8px">
+        <span class="ib"><svg class="ico" viewBox="0 0 24 24"><path d="M20 12 12 20l-8-8V4h8z"/><circle cx="8.500" cy="8.500" r="1"/></svg></span>
+        <span class="ib"><svg class="ico" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.300 21a1.940 1.940 0 0 0 3.400 0"/></svg></span>
+        <span class="ib"><svg class="ico" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg></span>
+        <span class="ib"><svg class="ico" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></span>
+      </div>
+      <div class="btn" style="height:40px;padding:0 18px;border-radius:999px;font-size:15px">Add task</div>
+    </div>
+    <div class="kb" id="kb"></div>
+  </div>
+</div></figure>
+
+<figure><figcaption>15 · Task details</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body">
+    <div class="row between cap"><span>‹ &nbsp;<i class="dot" style="background:var(--teal)"></i> Work</span><span>⋯</span></div>
+    <div class="row" style="align-items:flex-start;margin-top:20px"><div class="cb p3" style="margin-top:5px"></div><h2 style="margin:0">Submit project report</h2></div>
+    <div style="margin-top:16px">
+      <div class="prop"><span>Due</span>Fri 27 Nov, 17:00</div>
+      <div class="prop"><span>Reminder</span>1 hour before</div>
+      <div class="prop"><span>Priority</span><span style="color:var(--p3);width:auto;font-size:15px">⚑ High</span></div>
+      <div class="prop" style="border:0"><span>Tags</span><span class="chip" style="width:auto;height:28px">q4</span></div>
+    </div>
+    <div class="row" style="gap:8px;margin-top:8px"><span class="chip">+ Planned</span><span class="chip">+ Repeat</span><span class="chip">+ Goal</span></div>
+    <div class="over"><span>Subtasks · 2/5</span><span style="color:var(--accent);text-transform:none;letter-spacing:0">Suggest</span></div>
+    <div class="task" style="padding:8px 0"><div class="cb done" style="width:18px;height:18px"></div><div class="tt" style="font-size:15px;color:var(--text3);text-decoration:line-through">Collect figures from finance</div></div>
+    <div class="task" style="padding:8px 0"><div class="cb done" style="width:18px;height:18px"></div><div class="tt" style="font-size:15px;color:var(--text3);text-decoration:line-through">Draft summary</div></div>
+    <div class="task" style="padding:8px 0"><div class="cb" style="width:18px;height:18px"></div><div class="tt" style="font-size:15px">Add charts</div></div>
+    <div class="task" style="padding:8px 0"><div class="cb" style="width:18px;height:18px"></div><div class="tt" style="font-size:15px">Proofread</div></div>
+    <div class="cap" style="margin-top:8px;color:var(--text3)">+ Add subtask</div>
+  </div>
+</div></figure>
+
+<figure><figcaption>30 · AI action confirmation</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body" style="padding-bottom:0">
+    <div class="row between cap"><span>✕</span><span class="row" style="gap:6px"><svg class="spark" style="margin:0" viewBox="0 0 16 16"><use href="#sp"/></svg>Suggested changes</span><span></span></div>
+    <h2>Reschedule 4 overdue tasks</h2>
+    <p class="cap" style="margin-top:6px">Spread across this week inside your working hours. No deadlines change unless you tick the last item.</p>
+    <div class="over"><span>Update · 3</span></div>
+    <div class="card" style="padding:4px 16px">
+      <div class="pi"><div class="sq on"></div><div><div class="tt" style="font-size:15px">Send invoice to Northwind</div><div class="diff">Planned: none → <b>Today 10:00–10:30</b></div></div></div>
+      <div class="pi"><div class="sq on"></div><div><div class="tt" style="font-size:15px">Renew domain</div><div class="diff">Planned: Thu 12 → <b>Tue 17 Nov</b></div></div></div>
+      <div class="pi"><div class="sq on"></div><div><div class="tt" style="font-size:15px">Reply to Priya</div><div class="diff">Planned: Fri 13 → <b>Today</b></div></div></div>
+    </div>
+    <div class="over"><span style="color:var(--danger)">Needs your OK · 1</span></div>
+    <div class="dangerbox"><div class="pi"><div class="sq"></div><div><div class="tt" style="font-size:15px">Quarterly review deck</div><div class="diff">Deadline: Fri 13 → <b>Thu 19 Nov</b></div></div></div></div>
+  </div>
+  <div style="padding:12px 20px 20px;border-top:1px solid var(--border);background:var(--surface)"><div class="btn">Apply 3 changes</div><div class="btn ghost" style="height:40px">Dismiss</div></div>
+</div></figure>
+
+<figure><figcaption>31 · Progress → Habits</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body">
+    <div class="row between"><h2 style="margin:0">Progress</h2><span style="font-size:26px;color:var(--text2);font-weight:300">+</span></div>
+    <div class="seg"><span class="on">Habits</span><span>Goals</span><span>Insights</span></div>
+    <div class="cap" style="margin-top:16px">2 of 4 done today</div>
+    <div class="card habit"><div class="hic" style="background:var(--accentSoft);color:var(--moss)">◎</div><div><h3>Read 20 pages</h3><div class="cap">12 day streak</div><div class="days"><i style="background:var(--moss)"></i><i style="background:var(--moss)"></i><i style="background:var(--moss)"></i><i style="background:var(--moss)"></i><i style="background:var(--moss)"></i><i style="background:var(--moss)"></i><i style="background:var(--moss)"></i></div></div><div class="check" style="background:var(--moss);border-color:var(--moss)">✓</div></div>
+    <div class="card habit"><div class="hic" style="background:var(--surfaceAlt);color:var(--teal)">◇</div><div><h3>Drink water</h3><div class="cap">5 of 8 glasses</div><div class="days"><i style="background:var(--teal)"></i><i style="background:var(--teal)"></i><i></i><i style="background:var(--teal)"></i><i style="background:var(--teal)"></i><i style="background:var(--teal)"></i><i></i></div></div><div class="check" style="color:var(--text2);font-size:20px;font-weight:400">+</div></div>
+    <div class="card habit"><div class="hic" style="background:var(--surfaceAlt);color:var(--amber)">△</div><div><h3>Exercise</h3><div class="cap">3 of 4 this week</div><div class="days"><i style="background:var(--amber)"></i><i></i><i style="background:var(--amber)"></i><i></i><i style="background:var(--amber)"></i><i></i><i></i></div></div><div class="check"></div></div>
+    <div class="card habit"><div class="hic" style="background:var(--surfaceAlt);color:var(--plum)">○</div><div><h3>Meditate</h3><div class="cap">4 day streak</div><div class="days"><i></i><i></i><i style="background:var(--plum)"></i><i style="background:var(--plum)"></i><i style="background:var(--plum)"></i><i style="background:var(--plum)"></i><i style="background:var(--plum)"></i></div></div><div class="check" style="background:var(--plum);border-color:var(--plum)">✓</div></div>
+  </div>
+  <div class="tabs"><span><i></i>Today</span><span><i></i>Browse</span><span><i></i>Calendar</span><span class="on"><i></i>Progress</span><span><i></i>Assistant</span></div>
+</div></figure>
+
+<figure><figcaption>25 · Assistant</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body">
+    <div class="row between"><h3>Assistant</h3><span class="cap">History</span></div>
+    <div class="bubble">Move everything from tomorrow to Thursday</div>
+    <div class="cap" style="margin-bottom:8px;color:var(--text3)">Looked at 6 tasks planned for Tue 17 Nov</div>
+    <div class="ai"><svg class="spark" style="margin-top:4px" viewBox="0 0 16 16"><use href="#sp"/></svg><div>Thursday has room for five of the six. "Team sync prep" is tied to Wednesday's meeting, so I've left it where it is. The changes are ready for you to review.</div></div>
+    <div class="card" style="margin-top:14px"><h3>Move 5 tasks to Thursday</h3><div class="cap" style="margin:2px 0 12px">5 changes · no deadlines affected</div><div class="btn" style="height:44px;font-size:15px">Review</div></div>
+  </div>
+  <div class="composer"><span style="flex:1">Ask or tell me what to change</span><svg class="ico" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg><div class="send">↑</div></div>
+  <div class="tabs"><span><i></i>Today</span><span><i></i>Browse</span><span><i></i>Calendar</span><span><i></i>Progress</span><span class="on"><i></i>Assistant</span></div>
+</div></figure>
+
+<div class="sect">Onboarding</div>
+
+<figure><figcaption>2 · Welcome</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body" style="display:flex;flex-direction:column;padding-bottom:24px">
+    <div class="row" style="gap:8px;margin-top:28px"><svg class="spark" style="width:20px;height:20px;margin:0" viewBox="0 0 16 16"><use href="#sp"/></svg><h3>Cadence</h3></div>
+    <div class="display" style="margin-top:96px;font-size:40px;line-height:46px">Plan less.<br>Do more of what matters.</div>
+    <div style="margin-top:28px;display:grid;gap:14px;font-size:15px;color:var(--text2)">
+      <div class="row"><div class="cb p2" style="margin:0"></div>Capture anything in seconds</div>
+      <div class="row"><div class="cb p3" style="margin:0"></div>Get a realistic plan for today</div>
+      <div class="row"><div class="cb done" style="margin:0;background:var(--accent);border-color:var(--accent)"></div>Keep habits and goals moving</div>
+    </div>
+    <div style="margin-top:auto;display:grid;gap:10px">
+      <div class="btn">Create account</div>
+      <div class="btn sec">Continue with Apple</div>
+      <div class="btn sec">Continue with Google</div>
+      <div class="btn ghost" style="height:40px;font-size:15px">I already have an account</div>
+    </div>
+  </div>
+</div></figure>
+
+<figure><figcaption>7 · Productivity preferences</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body" style="display:flex;flex-direction:column;padding-bottom:24px">
+    <div class="row between cap"><span>‹</span><span>Skip</span></div>
+    <div class="display" style="font-size:30px;line-height:36px">Set things up your way</div>
+    <div class="over" style="margin-top:20px"><span>What do you want to organise?</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px"><span class="chip sel">Personal</span><span class="chip sel">Work</span><span class="chip sel">Study</span><span class="chip">Side projects</span><span class="chip">Health</span><span class="chip">Home</span></div>
+    <div class="over"><span>When do you usually work?</span></div>
+    <div class="card" style="padding:0 16px"><div class="lrow"><span>Hours</span><span class="n" style="color:var(--text)">09:00 – 18:00</span></div><div class="lrow"><span>Days</span><span class="n" style="color:var(--text)">Mon – Fri</span></div></div>
+    <div class="over"><span>When are you sharpest?</span></div>
+    <div class="seg" style="margin:0"><span class="on">Morning</span><span>Afternoon</span><span>Evening</span></div>
+    <div class="card row" style="margin-top:20px;align-items:flex-start"><svg class="spark" viewBox="0 0 16 16"><use href="#sp"/></svg><div><div style="font-size:15px;line-height:21px">Let the assistant use your tasks to help plan</div><div class="cap" style="color:var(--accent);margin-top:2px">What this means</div></div><div class="swt on"></div></div>
+    <div class="btn" style="margin-top:auto">Continue</div>
+  </div>
+</div></figure>
+
+<div class="sect">Organisation</div>
+
+<figure><figcaption>Browse tab (entry to 10–13, 18, 21, 24)</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body">
+    <div class="row between"><h2 style="margin:0">Browse</h2><svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg></div>
+    <div class="row" style="gap:8px;margin-top:14px"><span class="chip sel">All</span><span class="chip">Personal</span><span class="chip">Work</span><span class="chip">Study</span></div>
+    <div style="margin-top:10px">
+      <div class="lrow">Inbox<span class="n">4</span></div>
+      <div class="lrow">Today<span class="n">6</span></div>
+      <div class="lrow">Upcoming<span class="n">18</span></div>
+      <div class="lrow">All tasks<span class="n">41</span></div>
+      <div class="lrow">Completed</div>
+    </div>
+    <div class="over" style="margin-top:18px"><span>Saved views</span></div>
+    <div class="lrow" style="border:0;min-height:36px">High priority this week<span class="n">5</span></div>
+    <div class="over" style="margin-top:14px"><span>Work</span><span style="color:var(--accent);text-transform:none;letter-spacing:0">See all</span></div>
+    <div class="lrow"><i class="dot" style="background:var(--teal)"></i>Q4 report<span class="n">12 of 30</span><div class="ring" style="--v:40;--c:var(--teal)"></div></div>
+    <div class="lrow"><i class="dot" style="background:var(--amber)"></i>Website refresh<span class="n">7 of 9</span><div class="ring" style="--v:78;--c:var(--amber)"></div></div>
+  </div>
+  <div class="fab">+</div>
+  <div class="tabs"><span><i></i>Today</span><span class="on"><i></i>Browse</span><span><i></i>Calendar</span><span><i></i>Progress</span><span><i></i>Assistant</span></div>
+</div></figure>
+
+<figure><figcaption>22 · Kanban board (card being dragged)</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body">
+    <div class="row between cap"><span>‹ &nbsp;Browse</span><span>⋯</span></div>
+    <div class="row" style="margin-top:12px"><i class="dot" style="background:var(--teal);width:10px;height:10px"></i><h2 style="margin:0;flex:1">Q4 report</h2><div class="ring" style="--v:40;--c:var(--teal)" data-l="40"></div></div>
+    <div class="seg"><span>List</span><span class="on">Board</span><span>Calendar</span></div>
+    <div class="cols">
+      <div class="col">
+        <div class="row between"><h3 style="font-size:15px">In progress <span style="color:var(--text3);font-weight:400">3</span></h3><span class="cap">⋯</span></div>
+        <div class="kc" style="border-left-color:var(--p4)">Collect figures from finance<div class="meta" style="margin-top:4px"><span class="red">Overdue · Fri</span></div></div>
+        <div class="kc lift" style="border-left-color:var(--p3)">Draft executive summary<div class="meta" style="margin-top:4px"><span>Wed 18 Nov</span><span>1/3</span></div></div>
+        <div class="kc" style="border-left-color:var(--p2)">Build revenue charts<div class="meta" style="margin-top:4px"><span>Thu 19 Nov</span><span>q4</span></div></div>
+        <div class="cap" style="margin-top:12px;color:var(--text3)">+ Add task</div>
+      </div>
+      <div class="col">
+        <div class="row between"><h3 style="font-size:15px">Review <span style="color:var(--text3);font-weight:400">1</span></h3></div>
+        <div class="kc">Intro section</div>
+        <div style="height:64px;border:1.500px dashed var(--accent);border-radius:12px;margin-top:8px;background:var(--accentSoft)"></div>
+      </div>
+    </div>
+  </div>
+  <div class="fab">+</div>
+  <div class="tabs"><span><i></i>Today</span><span class="on"><i></i>Browse</span><span><i></i>Calendar</span><span><i></i>Progress</span><span><i></i>Assistant</span></div>
+</div></figure>
+
+<figure><figcaption>23 · Calendar, day view with a conflict</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body">
+    <div class="row between"><h2 style="margin:0">November</h2><div class="row" style="gap:8px"><span class="chip" style="height:28px">Today</span><span class="chip sel" style="height:28px">Day</span><svg class="spark" style="margin:0" viewBox="0 0 16 16"><use href="#sp"/></svg></div></div>
+    <div class="ws"><span class="on">M<b>16</b></span><span>T<b>17</b></span><span>W<b>18</b></span><span>T<b>19</b></span><span>F<b>20</b></span><span>S<b>21</b></span><span>S<b>22</b></span></div>
+    <div class="row" style="gap:8px;margin-top:10px"><span class="cap" style="width:36px">All day</span><span class="chip" style="height:26px"><i class="dot" style="background:var(--plum)"></i>Review chapter 4 notes</span></div>
+    <div class="tg">
+      <div class="hr">09:00</div><div class="hr">10:00</div><div class="hr">11:00</div><div class="hr">12:00</div><div class="hr">13:00</div><div class="hr">14:00</div>
+      <div class="blk" style="--c:var(--teal);top:4px;height:80px">Draft executive summary<small>09:00 – 10:30 · deep work</small></div>
+      <div class="blk" style="--c:var(--teal);top:60px;height:30px;left:55%" >Send invoice<small></small></div>
+      <div class="blk cf" style="--c:var(--warning);top:60px;height:30px;left:44px;right:47%">Overlap</div>
+      <div class="blk" style="--c:var(--amber);top:116px;height:52px">Website refresh: review copy<small>11:00 – 12:00</small></div>
+      <div class="blk" style="--c:var(--moss);top:228px;height:42px">Call landlord<small>13:00 – 13:45</small></div>
+      <div class="now" style="top:140px"></div>
+    </div>
+  </div>
+  <div class="drawer"><div class="grab" style="margin-bottom:8px"></div><div class="row between"><span class="over" style="margin:0">Unscheduled · 3</span><span class="chip" style="height:26px;background:var(--accentSoft);color:var(--accent)">Resolve conflict</span></div>
+    <div class="row" style="gap:8px;margin-top:8px;overflow:hidden"><span class="chip">Book dentist</span><span class="chip">Reply to Priya</span><span class="chip">Renew domain</span></div></div>
+  <div class="tabs"><span><i></i>Today</span><span><i></i>Browse</span><span class="on"><i></i>Calendar</span><span><i></i>Progress</span><span><i></i>Assistant</span></div>
+</div></figure>
+
+<div class="sect">AI</div>
+
+<figure><figcaption>26 · AI daily planner, result</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body" style="padding-bottom:0">
+    <div class="row between cap"><span>✕</span><span class="row" style="gap:6px"><svg class="spark" style="margin:0" viewBox="0 0 16 16"><use href="#sp"/></svg>Plan for today</span><span style="color:var(--accent)">Regenerate</span></div>
+    <p class="cap" style="margin-top:14px">5 tasks in 4 h 15 min, between 09:00 and 18:00. Hardest work is in the morning, when you said you're sharpest.</p>
+    <div style="margin-top:8px">
+      <div class="pl"><time>09:00</time><div><div class="tt" style="font-size:15px">Draft executive summary</div><div class="cap">90 min · due Wednesday, needs focus</div></div></div>
+      <div class="pl"><time>10:45</time><div><div class="tt" style="font-size:15px">Send invoice to Northwind</div><div class="cap">30 min · overdue since Friday</div></div></div>
+      <div class="pl"><time>11:30</time><div><div class="tt" style="font-size:15px">Review chapter 4 notes</div><div class="cap">45 min · due today</div></div></div>
+      <div class="pl"><time>14:00</time><div><div class="tt" style="font-size:15px">Submit project report</div><div class="cap">60 min · due 17:00, 3 subtasks left</div></div></div>
+      <div class="pl"><time>15:15</time><div><div class="tt" style="font-size:15px">Book dentist appointment</div><div class="cap">30 min · quick errand</div></div></div>
+    </div>
+    <div class="over" style="margin-top:16px"><span>Left for later · 2</span></div>
+    <div class="cap" style="line-height:20px">Renew domain: not due until the 30th<br>Website refresh copy: no room today, due Thursday</div>
+  </div>
+  <div style="padding:12px 20px 20px;border-top:1px solid var(--border);background:var(--surface)"><div class="btn">Apply plan</div><div class="cap" style="text-align:center;margin-top:8px">Adds 5 time blocks. No deadlines change.</div></div>
+</div></figure>
+
+<figure><figcaption>27 · AI task breakdown</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body" style="padding-bottom:0">
+    <div class="row between cap"><span>✕</span><span class="row" style="gap:6px"><svg class="spark" style="margin:0" viewBox="0 0 16 16"><use href="#sp"/></svg>Break down</span><span style="color:var(--accent)">Regenerate</span></div>
+    <div class="card" style="margin-top:14px;padding:12px 14px"><div class="cap">Objective</div><div style="font-size:15px;line-height:21px;margin-top:2px">Launch the redesigned portfolio website by 15 December</div></div>
+    <div style="margin-top:10px">
+      <div class="pi" style="padding:9px 0"><div class="sq on"></div><div class="tt" style="font-size:15px">Finalise content</div><span class="est">Mon 23 Nov</span></div>
+      <div class="pi" style="padding:7px 0 7px 32px"><div class="sq on" style="width:16px;height:16px;border-radius:5px"></div><div class="tt" style="font-size:14px">Rewrite About page</div><span class="est">1 h</span></div>
+      <div class="pi" style="padding:7px 0 7px 32px"><div class="sq on" style="width:16px;height:16px;border-radius:5px"></div><div class="tt" style="font-size:14px">Pick six case studies</div><span class="est">45 min</span></div>
+      <div class="pi" style="padding:9px 0"><div class="sq on"></div><div class="tt" style="font-size:15px">Design pages</div><span class="est">Mon 30 Nov</span></div>
+      <div class="pi" style="padding:7px 0 7px 32px"><div class="sq on" style="width:16px;height:16px;border-radius:5px"></div><div class="tt" style="font-size:14px">Home and case study layouts</div><span class="est">3 h</span></div>
+      <div class="pi" style="padding:7px 0 7px 32px"><div class="sq" style="width:16px;height:16px;border-radius:5px"></div><div class="tt" style="font-size:14px;color:var(--text3)">Dark mode variant</div><span class="est">2 h</span></div>
+      <div class="pi" style="padding:9px 0"><div class="sq on"></div><div class="tt" style="font-size:15px">Build and test</div><span class="est">Wed 9 Dec</span></div>
+      <div class="pi" style="padding:9px 0"><div class="sq on"></div><div class="tt" style="font-size:15px">Launch and announce</div><span class="est">Tue 15 Dec</span></div>
+    </div>
+    <div class="lrow" style="border:0;margin-top:4px;font-size:15px"><span class="cap">Add to</span>New project "Portfolio website"<span class="n">›</span></div>
+  </div>
+  <div style="padding:12px 20px 20px;border-top:1px solid var(--border);background:var(--surface)"><div class="btn">Add 7 tasks</div></div>
+</div></figure>
+
+<figure><figcaption>44 · AI preferences</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body">
+    <div class="row cap"><span>‹ &nbsp;Settings</span></div>
+    <h2>Assistant</h2>
+    <div class="card" style="padding:0 16px;margin-top:14px"><div class="lrow">Assistant<div class="swt on"></div></div><div class="lrow">Voice input<div class="swt on"></div></div></div>
+    <div class="over" style="margin-top:18px"><span>What the assistant can see</span></div>
+    <div class="card" style="padding:0 16px">
+      <div class="lrow" style="align-items:flex-start;padding:10px 0"><div class="sq r on" style="margin-top:3px"></div><div><div style="font-size:15px">Full</div><div class="cap">Titles, notes and comments</div></div></div>
+      <div class="lrow" style="align-items:flex-start;padding:10px 0"><div class="sq r" style="margin-top:3px"></div><div><div style="font-size:15px">Titles only</div><div class="cap">Notes and comments are never sent</div></div></div>
+      <div class="lrow" style="align-items:flex-start;padding:10px 0"><div class="sq r" style="margin-top:3px"></div><div><div style="font-size:15px">Off</div><div class="cap">No access to your data; planning is disabled</div></div></div>
+    </div>
+    <div class="over" style="margin-top:18px"><span>Memory</span></div>
+    <div class="card" style="padding:0 16px"><div class="lrow">Remember preferences<div class="swt on"></div></div><div class="lrow">What it remembers<span class="n">3 ›</span></div></div>
+    <div class="over" style="margin-top:18px"><span>Model</span></div>
+    <div class="card" style="padding:0 16px"><div class="lrow">Automatic<span class="n">Recommended ›</span></div></div>
+    <div class="cap" style="margin-top:16px">42 of 100 chat messages used this month</div><div class="pb"><i style="width:42%"></i></div>
+  </div>
+</div></figure>
+
+<div class="sect">Progress</div>
+
+<figure><figcaption>37 · Progress → Insights (analytics)</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body">
+    <div class="row between"><h2 style="margin:0">Progress</h2></div>
+    <div class="seg"><span>Habits</span><span>Goals</span><span class="on">Insights</span></div>
+    <div class="row" style="gap:8px;margin-top:12px"><span class="chip sel" style="height:28px">7 days</span><span class="chip" style="height:28px">30 days</span><span class="chip" style="height:28px">90 days</span></div>
+    <div class="tiles">
+      <div class="card"><div class="cap">Completed</div><div class="stat">34</div><span class="up">↑ 6 vs last week</span></div>
+      <div class="card"><div class="cap">On time</div><div class="stat">82%</div><span class="up">↑ 9 pts</span></div>
+      <div class="card"><div class="cap">Completion rate</div><div class="stat">71%</div><span class="cap">no change</span></div>
+      <div class="card"><div class="cap">Overdue now</div><div class="stat">1</div><span class="up">↓ 3</span></div>
+    </div>
+    <div class="card" style="margin-top:12px"><h3 style="font-size:15px">Completed per day</h3>
+      <div class="bars"><span><i style="height:55%"></i>M</span><span><i style="height:90%"></i>T</span><span><i style="height:70%"></i>W</span><span><i style="height:40%"></i>T</span><span><i style="height:62%"></i>F</span><span><i style="height:18%;opacity:.45"></i>S</span><span><i style="height:10%;opacity:.45"></i>S</span></div>
+      <div class="cap" style="margin-top:10px">Tuesday was your strongest day, with 9 tasks.</div></div>
+    <div class="card" style="margin-top:12px"><h3 style="font-size:15px">By priority</h3>
+      <div class="stack"><i style="flex:3;background:var(--p4)"></i><i style="flex:9;background:var(--p3)"></i><i style="flex:14;background:var(--p2)"></i><i style="flex:8;background:var(--p1)"></i></div>
+      <div class="cap" style="margin-top:8px">3 urgent · 9 high · 14 medium · 8 low</div></div>
+  </div>
+  <div class="tabs"><span><i></i>Today</span><span><i></i>Browse</span><span><i></i>Calendar</span><span class="on"><i></i>Progress</span><span><i></i>Assistant</span></div>
+</div></figure>
+
+<figure><figcaption>33 · Habit details</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body">
+    <div class="row between cap"><span>‹ &nbsp;Habits</span><span>⋯</span></div>
+    <div class="row" style="margin-top:14px"><div class="hic" style="background:var(--accentSoft);color:var(--moss)">◎</div><div><h2 style="margin:0;font-size:22px">Read 20 pages</h2><div class="cap">Every day · reminder 21:30</div></div></div>
+    <div class="tiles" style="grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div class="card"><div class="cap">Streak</div><div class="stat" style="font-size:24px">12</div></div>
+      <div class="card"><div class="cap">Best</div><div class="stat" style="font-size:24px">31</div></div>
+      <div class="card"><div class="cap">30 days</div><div class="stat" style="font-size:24px">87%</div></div>
+    </div>
+    <div class="card" style="margin-top:12px"><h3 style="font-size:15px">Last 19 weeks</h3><div class="hm" id="hm"></div>
+      <div class="cap" style="margin-top:10px">Done on 104 of 133 days.</div></div>
+    <div class="card" style="margin-top:12px"><h3 style="font-size:15px">By weekday</h3>
+      <div class="bars" style="height:64px"><span><i style="height:95%;background:var(--moss)"></i>M</span><span><i style="height:90%;background:var(--moss)"></i>T</span><span><i style="height:84%;background:var(--moss)"></i>W</span><span><i style="height:88%;background:var(--moss)"></i>T</span><span><i style="height:58%;background:var(--moss)"></i>F</span><span><i style="height:47%;background:var(--moss)"></i>S</span><span><i style="height:79%;background:var(--moss)"></i>S</span></div>
+      <div class="cap" style="margin-top:10px">Fridays and Saturdays are where it slips.</div></div>
+  </div>
+</div></figure>
+
+<figure><figcaption>35 · Goal details</figcaption>
+<div class="phone"><div class="status"></div>
+  <div class="body">
+    <div class="row between cap"><span>‹ &nbsp;Goals</span><span>⋯</span></div>
+    <div style="display:grid;justify-items:center;margin-top:12px"><div class="ring lg" style="--v:60;--c:var(--plum)" data-l="60%"></div></div>
+    <h2 style="text-align:center;font-size:22px">Pass the certification exam</h2>
+    <div class="cap" style="text-align:center;margin-top:2px">Target 31 January · 76 days left</div>
+    <div class="over" style="margin-top:18px"><span>Milestones · 3 of 5</span><span style="color:var(--accent);text-transform:none;letter-spacing:0">Manage</span></div>
+    <div class="task" style="padding:8px 0"><div class="cb done" style="width:18px;height:18px"></div><div class="tt" style="font-size:15px;color:var(--text3);text-decoration:line-through">Finish modules 1–3</div></div>
+    <div class="task" style="padding:8px 0"><div class="cb" style="width:18px;height:18px;border-color:var(--plum)"></div><div style="flex:1"><div class="tt" style="font-size:15px">Finish modules 4–6</div><div class="pb" style="margin-top:4px"><i style="width:50%;background:var(--plum)"></i></div></div><span class="cap">4 of 8 tasks</span></div>
+    <div class="task" style="padding:8px 0"><div class="cb" style="width:18px;height:18px"></div><div class="tt" style="font-size:15px">Two full practice exams</div></div>
+    <div class="sugg" style="margin-top:14px"><svg class="spark" viewBox="0 0 16 16"><use href="#sp"/></svg>
+      <div><b>Suggested next steps</b><div class="cap" style="margin-top:4px;line-height:19px">Schedule practice exam 1 for the week of 14 Dec<br>Add a weekly 2-hour review block</div><a>Review 2 suggestions</a></div></div>
+  </div>
+</div></figure>
+
+</div>
+<script>
+// Mock keyboard for the quick-add screen (illustration only; the app uses the system keyboard).
+(function(){var kb=document.getElementById('kb');if(!kb)return;
+[['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⇧:w','z','x','c','v','b','n','m','⌫:w'],['123:w',' :sp','return:w']]
+.forEach(function(r){var d=document.createElement('div');d.className='kr';r.forEach(function(k){var p=k.split(':'),i=document.createElement('i');i.textContent=p[0];if(p[1])i.className=p[1];d.appendChild(i);});kb.appendChild(d);});})();
+</script>
+<script>
+// Habit heatmap cells: fixed pattern so the preview is stable between loads.
+(function(){var el=document.getElementById('hm');if(!el)return;var lv=[0,.35,.6,.85,1],s=7;
+for(var i=0;i<133;i++){s=(s*73+19)%101;var c=document.createElement('i');var k=s<22?0:1+(s%4);
+if(k){c.style.background='var(--moss)';c.style.opacity=lv[k];}el.appendChild(c);}})();
+</script>
+</body>
+</html>
