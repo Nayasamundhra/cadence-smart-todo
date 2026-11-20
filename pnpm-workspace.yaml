@@ -1,0 +1,9 @@
+packages:
+  - packages/*
+
+# Install scripts of dependencies are denied unless reviewed here.
+allowBuilds:
+  '@sentry/cli': true # downloads the Sentry uploader binary used for source maps (doc 08 8.4)
+  '@parcel/watcher': false # compiles from source only; prebuilt platform packages are used (jest, expo cli)
+  dtrace-provider: false # optional native addon for the bunyan logger (via eas-cli)
+  protobufjs: false # postinstall only checks its own version scheme (via eas-cli)

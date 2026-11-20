@@ -1,0 +1,11 @@
+node_modules
+pnpm-lock.yaml
+.expo
+dist
+coverage
+packages/mobile/ios
+packages/mobile/android
+docs/design/preview.html
+supabase/.temp
+docs
+CLAUDE.md
