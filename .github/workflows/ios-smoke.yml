@@ -1,0 +1,109 @@
+name: ios-smoke
+
+# Verifies the app on iOS without a Mac of our own (docs/04-architecture.md section 4.12):
+# builds a Release simulator app on a GitHub macOS runner, boots an iOS Simulator,
+# runs the Maestro smoke flow and uploads screenshots.
+#
+# Billing note: macOS runner minutes cost more than Linux. PRs run only when mobile/shared code changes.
+
+on:
+  pull_request:
+    paths:
+      - 'packages/mobile/**'
+      - 'packages/shared/**'
+      - '.github/workflows/ios-smoke.yml'
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ios-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Keep in sync with .env.example. A rename changes only this value.
+  APP_BUNDLE_ID: com.example.cadence
+
+jobs:
+  ios:
+    name: iOS Simulator smoke test
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Generate the native iOS project
+        working-directory: packages/mobile
+        env:
+          APP_BUNDLE_ID: ${{ env.APP_BUNDLE_ID }}
+          EXPO_PUBLIC_ENV: development
+        run: npx expo prebuild --platform ios --no-install
+
+      - name: Build Release app for the simulator
+        working-directory: packages/mobile/ios
+        env:
+          EXPO_PUBLIC_ENV: development
+        run: |
+          set -euo pipefail
+          WORKSPACE=$(ls -d *.xcworkspace | head -n 1)
+          SCHEME="${WORKSPACE%.xcworkspace}"
+          echo "workspace=$WORKSPACE scheme=$SCHEME"
+          xcodebuild \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build | tail -n 40
+
+      - name: Boot an iPhone simulator
+        run: |
+          set -euo pipefail
+          UDID=$(xcrun simctl list devices available -j | jq -r '[.devices | to_entries[] | select(.key | test("iOS")) | .value[] | select(.name | startswith("iPhone"))] | last | .udid')
+          echo "Using simulator $UDID"
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
+
+      - name: Install the app
+        run: |
+          set -euo pipefail
+          APP=$(find packages/mobile/ios/build/Build/Products/Release-iphonesimulator -maxdepth 1 -name '*.app' | head -n 1)
+          echo "Installing $APP"
+          xcrun simctl install "$SIM_UDID" "$APP"
+
+      - name: Install Maestro
+        run: |
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Run smoke flow
+        run: |
+          set -euo pipefail
+          mkdir -p maestro-out
+          sed "s/__APP_ID__/${APP_BUNDLE_ID}/" packages/mobile/e2e/smoke.yaml > maestro-out/smoke.yaml
+          maestro --device "$SIM_UDID" test maestro-out/smoke.yaml --test-output-dir maestro-out/results
+
+      - name: Upload screenshots and results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-smoke-screenshots
+          path: maestro-out/
+          if-no-files-found: warn
