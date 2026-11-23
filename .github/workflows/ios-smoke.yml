@@ -53,6 +53,13 @@ jobs:
           EXPO_PUBLIC_ENV: development
         run: npx expo prebuild --platform ios --no-install
 
+      # `prebuild --no-install` skips CocoaPods, and the .xcworkspace only exists after `pod install`.
+      - name: Install CocoaPods dependencies
+        working-directory: packages/mobile/ios
+        env:
+          LANG: en_US.UTF-8
+        run: pod install
+
       - name: Build Release app for the simulator
         working-directory: packages/mobile/ios
         env:
