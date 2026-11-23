@@ -10,22 +10,26 @@ appId: __APP_ID__
 - assertVisible:
     id: 'screen-today'
 
-- tapOn: 'Browse'
+- tapOn:
+    id: 'tab-browse'
 - assertVisible:
     id: 'screen-browse'
 - takeScreenshot: 02-browse
 
-- tapOn: 'Calendar'
+- tapOn:
+    id: 'tab-calendar'
 - assertVisible:
     id: 'screen-calendar'
 - takeScreenshot: 03-calendar
 
-- tapOn: 'Progress'
+- tapOn:
+    id: 'tab-progress'
 - assertVisible:
     id: 'screen-progress'
 - takeScreenshot: 04-progress
 
-- tapOn: 'Assistant'
+- tapOn:
+    id: 'tab-assistant'
 - assertVisible:
     id: 'screen-assistant'
 - takeScreenshot: 05-assistant
