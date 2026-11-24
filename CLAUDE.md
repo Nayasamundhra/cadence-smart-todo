@@ -57,6 +57,8 @@ Run from the repo root unless stated. Package manager is pnpm (version pinned in
 | Reset local DB (apply migrations) | `pnpm db:reset`                                                                                      |
 | Serve Edge Functions            | `pnpm functions:serve`                                                                                 |
 | E2E smoke flow (Maestro)        | `packages/mobile/e2e/smoke.yaml`; run in CI by `.github/workflows/ios-smoke.yml` (iOS Simulator)       |
+| Design gallery flow (Maestro)   | `packages/mobile/e2e/gallery.yaml` (light + dark screenshots); also run by `ios-smoke.yml`              |
+| Design gallery (dev builds)     | Open the deep link `<scheme>://_dev/gallery`; the theme control at the top switches System/Light/Dark |
 
 Notes that save time:
 
@@ -80,3 +82,19 @@ Notes that save time:
   `adb shell am start -a android.intent.action.VIEW -d "exp+cadence://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"`.
 - iOS: `.github/workflows/ios-smoke.yml` is started by hand (Actions, Run workflow) or nightly; a push
   does not trigger it. Maestro taps tabs by `id` (`tab-<name>`), not by text.
+- Design system (Phase 1): tokens, `ThemeProvider` and `useTheme()` live in `src/design`; primitives in
+  `src/components/ui`. Import icons through `src/design/icons/lucide.ts` (add the icon there), never from
+  the `lucide-react-native` barrel: Metro does not tree-shake and the barrel adds about 2.5 MB. Jest maps
+  only the per-icon paths, so a barrel import fails loudly in tests.
+- Lint enforces rule 5 beyond hex colours: raw `fontSize`, `gap`, `padding*`, `margin*`, `border*Radius`
+  and `duration` numbers are errors in `app/`, `features/` and `components/` (not `components/ui`).
+- Phase 1 added native modules (reanimated, worklets, gesture-handler, svg, MMKV, menu, slider, haptics),
+  and `userInterfaceStyle` became `automatic`. A development build made before that does not contain
+  these modules, so expect it to fail at start-up until rebuilt (not yet confirmed on the phone). Rebuild
+  from the `development` profile in `packages/mobile/eas.json` (Android) and `ios-simulator` (iOS).
+  `src/services/storage.ts` falls back to memory if only MMKV is missing.
+- Jest mocks live in `packages/mobile/jest.setup.ts` (reanimated, gesture-handler, bottom-sheet, haptics,
+  MMKV). The first `renderRouter` in `__tests__/navigation.test.tsx` imports the whole route tree, hence its
+  60 s timeout. Use `renderThemed(ui, scheme)` from `src/test/renderThemed.tsx` for themed components.
+- Windows: a Python script that rewrites a file writes CRLF and reads UTF-8 as cp1252. Use the editor
+  tools, or pass `newline=''` and `encoding='utf-8'`.

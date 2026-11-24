@@ -69,7 +69,7 @@ export const palette = {
 // User-assignable colours for projects, tags, categories, habits, goals.
 // Stored in the DB as the key ('moss'), never as hex, so both themes can render it.
 export const swatches = {
-  moss: { light: '#4E7D4A', dark: '#8DBF88' },
+  moss: { light: '#4C7B48', dark: '#8DBF88' }, // light adjusted from #4E7D4A in Phase 1 (4.46 -> 4.59 on bg)
   teal: { light: '#1F7A7A', dark: '#6CC7C7' },
   sky: { light: '#2F74B5', dark: '#82B8EC' },
   indigo: { light: '#4B55B8', dark: '#9AA2F0' },
@@ -150,16 +150,23 @@ export const layout = {
 | success on surfaceAlt | 5.04  | 8.17 (on surface)   |
 
 Light `textTertiary` on `surfaceAlt` is 4.27 — below 4.5, so it must not carry essential text there.
-Swatch colours and `*Soft` pairings were chosen by eye and **have not been contrast-checked**; add a unit
-test that asserts ≥ 4.5 for each swatch on `bg` and `surface` in both themes and adjust any that fail.
+Phase 1 added the contrast tests (`src/design/contrast.test.ts`). Every swatch is now asserted ≥ 4.5 on
+`bg` and `surface` in both themes, as is every text pairing the components use (including each tone on
+its `*Soft` fill). One swatch failed and was adjusted: light `moss` `#4E7D4A` was 4.46 on `bg`; it is now
+`#4C7B48` (4.59 on `bg`, 4.96 on `surface`). The table above is also asserted, so it cannot drift.
+
+**Known gap, for the product owner:** `borderStrong` (the priority-none checkbox ring and input borders) is
+1.50:1 against `bg` in light and 1.88:1 in dark. WCAG 2.x asks 3:1 for the boundary of an interactive
+control, so these fail that criterion. It is the blueprint's value and has not been changed; the test pins
+it so any change is noticed. Priorities 1–4 all pass 3:1.
 
 ## 2.3 Typography
 
 - **UI:** Inter (400, 500, 600). Tabular numerals for counts, times and stats.
 - **Display:** Instrument Serif (400) — only for the Today date header, onboarding headlines, report
   titles and empty-state titles. Never for controls or body text.
-- Load with `expo-font`. Confirm both families are available as `@expo-google-fonts/*` packages;
-  otherwise bundle the font files from Google Fonts.
+- Load with `expo-font`. Confirmed in Phase 1: both families exist as `@expo-google-fonts/inter` (0.4.2) and
+  `@expo-google-fonts/instrument-serif` (0.4.1) and are bundled with the app (no network at run time).
 
 | Token      | Family           | Size / line | Weight                              | Use                             |
 | ---------- | ---------------- | ----------- | ----------------------------------- | ------------------------------- |
@@ -179,9 +186,15 @@ bar and `display`). Rows grow in height; nothing truncates essential content at 
 
 ## 2.4 Iconography
 
-Lucide icons via `lucide-react-native` (confirm the package and its SVG peer dependency). Size 20 in rows,
+Lucide icons via `lucide-react-native` (confirmed: v1.77, peer `react-native-svg`). Size 20 in rows,
 22 in the tab bar and headers, 16 inside chips. Stroke 1.75. Colour follows the adjacent text colour.
 The AI spark is a custom SVG in `src/design/icons/Spark.tsx`.
+
+**Import icons one by one**, through `src/design/icons/lucide.ts` (add the icon there, import it from
+`@/design`). Metro does not tree-shake, and importing from the package barrel put all of Lucide in the
+bundle: measured on the Android release bundle, 10.31 MB with the barrel against 7.82 MB with per-icon
+imports. Tab icons: Today `CalendarCheck`, Browse `LayoutGrid`, Calendar `Calendar`, Progress
+`ChartNoAxesColumn`, Assistant the Spark.
 
 ## 2.5 Motion and haptics
 
@@ -304,3 +317,33 @@ Sentence case everywhere. Buttons say what happens ("Add task", "Apply 4 changes
 wrong and what to do ("Couldn't reach the server. Your changes are saved and will sync later."). No
 exclamation marks, no "Oops". The assistant writes plainly and briefly, and never claims to have done
 something that is still a proposal.
+
+## 2.11 Implementation notes (Phase 1)
+
+Where the build deviates from, or fills a gap in, the sections above, and why.
+
+- **Extra tokens.** `tokens.ts` adds `controls` (component sizes from §2.6: button heights, chip, input,
+  checkbox, icon sizes, snackbar duration and so on), `fontFamily`, `typography`, `motion.easing`, and an
+  `emptyTitle` type variant (Instrument Serif 24, the `EmptyState` title the spec describes). Nothing in
+  the spec's own values changed except the `moss` swatch above.
+- **Danger button label.** §2.6 does not say what colour the label of a `danger` button is. It uses
+  `surface` (white in light, near-black in dark): 5.76 and 6.35 against the danger fill. `onAccent` would
+  be unreadable on the lighter dark-theme danger.
+- **Snackbar colours.** The bar is inverted (`text` fill, `bg` message, `accentSoft` action). Both pairs
+  are contrast-tested in both themes.
+- **Theme.** The preference (system, light, dark) is stored in MMKV and read synchronously, so the first
+  frame is already correct. `userInterfaceStyle` is `automatic` in `app.config.ts`, and the provider calls
+  `Appearance.setColorScheme` so native chrome follows the in-app choice. In React Native 0.88 the reset
+  value is `'auto'` (older versions used `null`).
+- **Screen-reader alerts.** `role="alert"` is set on the message text of `ErrorState` and the danger
+  `Banner`, not on their container: a container that holds a button must not become one accessibility
+  node, or the button disappears for VoiceOver and TalkBack.
+- **Menu.** `@react-native-menu/menu` gives a native menu on both platforms, so no action-sheet fallback was
+  needed. Menu rows are text-only: its icons are SF Symbol and Android drawable names, which do not match
+  Lucide.
+- **Gallery.** `/_dev/gallery` (dev builds only, redirects in production). The theme control at the top
+  switches System / Light / Dark live. `GALLERY_COVERS` is compared with the `components/ui` exports in a
+  test, so a new primitive cannot ship without a gallery entry.
+- **Lint.** CLAUDE.md rule 5 is now enforced beyond hex colours: raw `fontSize`, `lineHeight`, `gap`,
+  `padding*`, `margin*`, `border*Radius` and `duration` numbers are errors in `app/`, `features/` and
+  `components/` (except `components/ui`, which implements the tokens and still may not contain hex).

@@ -26,6 +26,7 @@ permissions:
 env:
   # Keep in sync with .env.example. A rename changes only this value.
   APP_BUNDLE_ID: com.example.cadence
+  APP_SCHEME: cadence
 
 jobs:
   ios:
@@ -106,6 +107,22 @@ jobs:
           mkdir -p maestro-out
           sed "s/__APP_ID__/${APP_BUNDLE_ID}/" packages/mobile/e2e/smoke.yaml > maestro-out/smoke.yaml
           maestro --device "$SIM_UDID" test maestro-out/smoke.yaml --test-output-dir maestro-out/results
+
+      # Phase 1: the design gallery in light and dark at the default text size, then again with the
+      # largest "accessibility-large" Dynamic Type step (about 2x body text) to check nothing truncates.
+      - name: Run design gallery flow
+        run: |
+          set -euo pipefail
+          mkdir -p maestro-out
+          sed -e "s/__APP_ID__/${APP_BUNDLE_ID}/" -e "s/__APP_SCHEME__/${APP_SCHEME}/"             packages/mobile/e2e/gallery.yaml > maestro-out/gallery.yaml
+          maestro --device "$SIM_UDID" test maestro-out/gallery.yaml -e PREFIX=gallery             --test-output-dir maestro-out/gallery-results
+
+      - name: Run design gallery flow at large text
+        run: |
+          set -euo pipefail
+          xcrun simctl ui "$SIM_UDID" content_size accessibility-large
+          maestro --device "$SIM_UDID" test maestro-out/gallery.yaml -e PREFIX=gallery-large-text             --test-output-dir maestro-out/gallery-large-text-results
+          xcrun simctl ui "$SIM_UDID" content_size large
 
       - name: Upload screenshots and results
         if: always()
