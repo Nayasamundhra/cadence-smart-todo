@@ -72,3 +72,11 @@ Notes that save time:
 - App identity (name, scheme, bundle id) comes from env via `packages/mobile/app.config.ts`.
   Never write the product name as a literal in UI copy; use `APP_NAME` from `src/lib/appInfo.ts`.
 - Docs and this file are excluded from Prettier on purpose.
+- `expo start` rewrites `packages/mobile/tsconfig.json` (reformats it and drops the `.expo/types` and
+  `expo-env.d.ts` includes). Run `git status` before committing and revert it with
+  `git checkout packages/mobile/tsconfig.json`.
+- Android phone over USB: run `adb reverse tcp:8081 tcp:8081` so the development build reaches Metro.
+  The mapping is lost when the phone restarts or USB reconnects. Open the app with
+  `adb shell am start -a android.intent.action.VIEW -d "exp+cadence://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"`.
+- iOS: `.github/workflows/ios-smoke.yml` is started by hand (Actions, Run workflow) or nightly; a push
+  does not trigger it. Maestro taps tabs by `id` (`tab-<name>`), not by text.
