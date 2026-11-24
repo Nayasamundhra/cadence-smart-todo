@@ -21,8 +21,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     version: '0.1.0',
     orientation: 'portrait',
     icon: './assets/icon.png',
-    // Phase 1 (ThemeProvider) switches this to 'automatic'.
-    userInterfaceStyle: 'light',
+    // 'automatic' lets the in-app theme (system, light or dark) take effect: with 'light' the OS would
+    // pin the app to light and Appearance.setColorScheme would have no effect (see ThemeProvider).
+    userInterfaceStyle: 'automatic',
     ios: {
       supportsTablet: true,
       bundleIdentifier: APP_BUNDLE_ID,

@@ -12,6 +12,10 @@ const TABS = [
   { label: 'Assistant', path: '/assistant', testId: 'screen-assistant' },
 ] as const;
 
+// The first renderRouter call imports the whole route tree (design system, sheets, icons), which takes
+// several seconds on a cold Jest cache, e.g. on a fresh CI runner. The default 5 s is too tight.
+jest.setTimeout(60_000);
+
 describe('navigation skeleton', () => {
   it('opens on Today from the entry route', async () => {
     await renderRouter('./app');

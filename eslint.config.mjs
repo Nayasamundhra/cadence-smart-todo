@@ -6,14 +6,28 @@ import expo from 'eslint-config-expo/flat.js';
 
 const HEX_COLOUR = '^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$';
 
-/** Reusable "no hex colours" rule (CLAUDE.md rule 5: tokens only in screen code). */
-const noHexColours = [
-  'error',
-  {
-    selector: `Literal[value=/${HEX_COLOUR}/]`,
-    message: 'No hex colours in screen code. Use theme tokens from src/design (Phase 1).',
-  },
-];
+const HEX_RULE = {
+  selector: `Literal[value=/${HEX_COLOUR}/]`,
+  message: 'No hex colours in screen code. Use theme tokens from src/design.',
+};
+
+/**
+ * Styling numbers belong in the tokens (CLAUDE.md rule 5): font sizes, spacing and durations in
+ * screen code come from `useTheme()`. Zero is allowed. Component primitives in components/ui are
+ * exempt because they implement the tokens; they still may not contain hex colours.
+ */
+const STYLE_KEYS =
+  '^(fontSize|lineHeight|letterSpacing|gap|rowGap|columnGap|duration|border(Top|Bottom|Left|Right)?(Start|End)?(Width|Radius)|(padding|margin)(Top|Bottom|Left|Right|Start|End|Horizontal|Vertical)?)$';
+const NUMBER_RULE = {
+  selector: `Property[key.name=/${STYLE_KEYS}/] > Literal[value=type(number)]:not([value=0])`,
+  message:
+    'No raw font sizes, spacing or durations in screen code. Use tokens: theme.space, theme.radius, theme.typography, theme.motion.',
+};
+
+/** CLAUDE.md rule 5 for screen code: no hex colours and no raw styling numbers. */
+const tokensOnly = ['error', HEX_RULE, NUMBER_RULE];
+/** For the primitives themselves: hex colours stay banned, sizes are theirs to define. */
+const noHexColours = ['error', HEX_RULE];
 
 /** Shared import-restriction building blocks (merged per folder below). */
 const SQLITE = {
@@ -137,13 +151,18 @@ export default tseslint.config(
     },
   },
 
-  // Tokens only in screen code. Placeholder values are exempt only until Phase 1 adds the tokens.
+  // Tokens only in screen code.
   {
     files: [
       'packages/mobile/app/**/*.{ts,tsx}',
       'packages/mobile/src/components/**/*.{ts,tsx}',
       'packages/mobile/src/features/**/*.{ts,tsx}',
     ],
+    ignores: ['packages/mobile/src/components/ui/**'],
+    rules: { 'no-restricted-syntax': tokensOnly },
+  },
+  {
+    files: ['packages/mobile/src/components/ui/**/*.{ts,tsx}'],
     rules: { 'no-restricted-syntax': noHexColours },
   },
 

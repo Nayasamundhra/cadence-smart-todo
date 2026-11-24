@@ -1,23 +1,29 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { View } from 'react-native';
+import { Text } from '@/components/ui';
+import { useTheme } from '@/design';
 import { APP_NAME } from '@/lib/appInfo';
 
-/**
- * Phase 0 stand-in for a tab. Replaced by the real screens in later phases.
- * Phase 1 introduces the theme tokens; until then this uses no custom colours.
- */
+/** Stand-in for a tab until its real screen arrives in a later phase. Uses tokens only. */
 export function PlaceholderScreen({ name }: { name: string }) {
+  const { colors, space, layout } = useTheme();
   return (
-    <View style={styles.container} testID={`screen-${name.toLowerCase()}`}>
-      <Text style={styles.title} accessibilityRole="header">
+    <View
+      testID={`screen-${name.toLowerCase()}`}
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: layout.screenPadding,
+        gap: space[2],
+        backgroundColor: colors.bg,
+      }}
+    >
+      <Text variant="title1" accessibilityRole="header">
         {name}
       </Text>
-      <Text style={styles.caption}>{APP_NAME}: placeholder screen</Text>
+      <Text variant="caption" color="textSecondary">
+        {APP_NAME}: placeholder screen
+      </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20, gap: 8 },
-  title: { fontSize: 24, fontWeight: '600' },
-  caption: { fontSize: 13, opacity: 0.6 },
-});
