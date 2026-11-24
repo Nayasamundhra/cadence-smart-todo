@@ -1,0 +1,63 @@
+# Phase 1 design-gallery flow: opens the dev-only gallery and screenshots it in light and dark.
+# Run on Android and iOS. Placeholders are replaced by CI (see .github/workflows/ios-smoke.yml), so the
+# product rename stays a one-line change in .env / app.config.ts:
+#   __APP_ID__     bundle id / package name
+#   __APP_SCHEME__ URL scheme
+# ${PREFIX} (pass with `maestro test -e PREFIX=...`) names the screenshots, so the same flow can be run
+# again at a large text size without overwriting the first set.
+appId: __APP_ID__
+---
+- launchApp:
+    clearState: true
+- openLink: __APP_SCHEME__://_dev/gallery
+# iOS asks "Open in <app>?" for custom URL schemes; Android does not, hence optional.
+- tapOn:
+    text: 'Open'
+    optional: true
+- assertVisible:
+    id: 'gallery'
+- takeScreenshot: ${PREFIX}-light-01-top
+
+- scrollUntilVisible:
+    element:
+      text: 'Input'
+- takeScreenshot: ${PREFIX}-light-02-input
+- scrollUntilVisible:
+    element:
+      text: 'Checkbox'
+- takeScreenshot: ${PREFIX}-light-03-checkbox
+- scrollUntilVisible:
+    element:
+      text: 'Banner'
+- takeScreenshot: ${PREFIX}-light-04-banner
+- scrollUntilVisible:
+    element:
+      text: 'Swatches'
+- takeScreenshot: ${PREFIX}-light-05-swatches
+
+# Dark: the theme control sits at the top, so scroll back up first.
+- scroll:
+    direction: UP
+- scrollUntilVisible:
+    element:
+      id: 'gallery-theme-dark'
+    direction: UP
+- tapOn:
+    id: 'gallery-theme-dark'
+- takeScreenshot: ${PREFIX}-dark-01-top
+- scrollUntilVisible:
+    element:
+      text: 'Input'
+- takeScreenshot: ${PREFIX}-dark-02-input
+- scrollUntilVisible:
+    element:
+      text: 'Checkbox'
+- takeScreenshot: ${PREFIX}-dark-03-checkbox
+- scrollUntilVisible:
+    element:
+      text: 'Banner'
+- takeScreenshot: ${PREFIX}-dark-04-banner
+- scrollUntilVisible:
+    element:
+      text: 'Swatches'
+- takeScreenshot: ${PREFIX}-dark-05-swatches
