@@ -4,6 +4,8 @@ import { useTheme } from '@/design/ThemeProvider';
 import { useReduceMotion } from '@/design/useReduceMotion';
 import { fontFamily, typography } from '@/design/tokens';
 import { haptics } from '@/services/haptics';
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
+import { useInSheet } from './sheetContext';
 import { Text } from './Text';
 
 export interface InputProps extends Omit<TextInputProps, 'style'> {
@@ -19,6 +21,9 @@ export const Input = forwardRef<ComponentRef<typeof TextInput>, InputProps>(func
   const { colors, controls, radius, space, motion } = useTheme();
   const [focused, setFocused] = useState(false);
   const reduceMotion = useReduceMotion();
+  // Inside a Sheet the library's own input reports keyboard events to the sheet.
+  // It takes the same props and ref, so it is typed as a TextInput.
+  const Field = (useInSheet() ? BottomSheetTextInput : TextInput) as typeof TextInput;
   const [shake] = useState(() => new Animated.Value(0));
 
   // Error shake: 6 px, two cycles (doc 02 section 2.5). Skipped with Reduce motion.
@@ -45,7 +50,7 @@ export const Input = forwardRef<ComponentRef<typeof TextInput>, InputProps>(func
         {label}
       </Text>
       <Animated.View style={{ transform: [{ translateX: shake }] }}>
-        <TextInput
+        <Field
           ref={ref}
           accessibilityLabel={label}
           accessibilityHint={error}

@@ -93,6 +93,9 @@ Notes that save time:
   these modules, so expect it to fail at start-up until rebuilt (not yet confirmed on the phone). Rebuild
   from the `development` profile in `packages/mobile/eas.json` (Android) and `ios-simulator` (iOS).
   `src/services/storage.ts` falls back to memory if only MMKV is missing.
+- `Sheet` is a plain `@gorhom/bottom-sheet` `BottomSheet` inside a `Modal` (the library's `BottomSheetModal`
+  never rendered on the Android phone; see doc 02 section 2.11). Do not reintroduce `BottomSheetModal`
+  without testing it on a device. Put text inputs inside sheets through `Input`, which adapts.
 - Jest mocks live in `packages/mobile/jest.setup.ts` (reanimated, gesture-handler, bottom-sheet, haptics,
   MMKV). The first `renderRouter` in `__tests__/navigation.test.tsx` imports the whole route tree, hence its
   60 s timeout. Use `renderThemed(ui, scheme)` from `src/test/renderThemed.tsx` for themed components.

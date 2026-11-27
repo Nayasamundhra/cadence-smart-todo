@@ -20,7 +20,11 @@ jest.mock('posthog-react-native', () => ({
  * test support where it ships one, so components still run for real.
  */
 jest.mock('react-native-reanimated', () => jest.requireActual('react-native-reanimated/mock'));
-jest.mock('@gorhom/bottom-sheet', () => jest.requireActual('@gorhom/bottom-sheet/mock'));
+// The library's mock has a `default` export but no __esModule flag, so `import BottomSheet from` needs it.
+jest.mock('@gorhom/bottom-sheet', () => ({
+  __esModule: true,
+  ...jest.requireActual('@gorhom/bottom-sheet/mock'),
+}));
 jest.mock('expo-haptics', () => ({
   notificationAsync: jest.fn(() => Promise.resolve()),
   impactAsync: jest.fn(() => Promise.resolve()),

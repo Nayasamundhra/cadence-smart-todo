@@ -14,7 +14,15 @@ import { Spark, useTheme } from '@/design';
 /** Tab label: the caption style, capped at 1.4x font scaling so the bar keeps its height (doc 02 section 2.3). */
 function TabLabel({ color, children }: { color: ColorValue; children: string }) {
   return (
-    <Text variant="caption" maxFontSizeMultiplier={1.4} numberOfLines={1} style={{ color }}>
+    <Text
+      variant="caption"
+      maxFontSizeMultiplier={1.4}
+      numberOfLines={1}
+      // Five labels share the bar width; shrink slightly rather than cut "Calendar" to "Calend...".
+      adjustsFontSizeToFit
+      minimumFontScale={0.8}
+      style={{ color }}
+    >
       {children}
     </Text>
   );

@@ -17,7 +17,7 @@ export function Switch({
   disabled = false,
   testID,
 }: SwitchProps) {
-  const { colors, controls } = useTheme();
+  const { colors, controls, isDark } = useTheme();
   return (
     <RNSwitch
       value={value}
@@ -28,7 +28,8 @@ export function Switch({
       accessibilityState={{ checked: value, disabled }}
       testID={testID}
       trackColor={{ false: colors.borderStrong, true: colors.accent }}
-      thumbColor={colors.surface}
+      // The thumb must stay light in dark mode: `surface` there is near-black and vanishes on the track.
+      thumbColor={isDark ? colors.text : colors.surface}
       ios_backgroundColor={colors.borderStrong}
       style={{ opacity: disabled ? controls.disabledOpacity : 1 }}
     />

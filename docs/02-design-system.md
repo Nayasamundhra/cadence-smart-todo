@@ -341,6 +341,20 @@ Where the build deviates from, or fills a gap in, the sections above, and why.
 - **Menu.** `@react-native-menu/menu` gives a native menu on both platforms, so no action-sheet fallback was
   needed. Menu rows are text-only: its icons are SF Symbol and Android drawable names, which do not match
   Lucide.
+- **Sheet is a plain bottom sheet in a `Modal`, not `BottomSheetModal`.** Found on the Android phone (Samsung
+  SM-G990E, Expo SDK 58 pins: Reanimated 4.7.1, worklets 0.13.0, gesture-handler 3.3.0, `@gorhom/bottom-sheet`
+  5.2.14): `BottomSheetModal.present()` was called and its portal rendered, but the sheet never animated in.
+  A plain `BottomSheet` on the same versions worked. The wrapper therefore uses `BottomSheet` inside a React
+  Native `Modal` with its own `GestureHandlerRootView`, which also gives back-button handling and removes the
+  need for `BottomSheetModalProvider` at the root. The library's keyboard handling also does nothing inside a
+  Modal on Android (the keyboard covered the sheet), so `Sheet` lifts itself by the `Keyboard` event height
+  via `bottomInset`, and `Input` switches to the library's `BottomSheetTextInput` while inside a sheet.
+  **iOS keyboard behaviour with this approach is not yet verified** (both mechanisms may apply there).
+- **Dialog buttons are stacked** (confirm on top). Side by side, "Delete task" was cut to "Delete ta…" at font
+  scale 1.1.
+- **Switch thumb** is `text` coloured in dark mode: `surface` is near-black there and vanished on the track.
+- **Tab labels** shrink to fit (`adjustsFontSizeToFit`, minimum 0.8) instead of truncating "Calendar" and
+  "Assistant" on a 1080 px wide phone at font scale 1.1.
 - **Gallery.** `/_dev/gallery` (dev builds only, redirects in production). The theme control at the top
   switches System / Light / Dark live. `GALLERY_COVERS` is compared with the `components/ui` exports in a
   test, so a new primitive cannot ship without a gallery entry.

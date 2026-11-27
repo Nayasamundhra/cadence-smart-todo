@@ -94,6 +94,7 @@ export function Dialog({
 
 const styles = StyleSheet.create({
   root: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  actions: { flexDirection: 'row' },
-  action: { flex: 1 },
+  // Stacked, confirm on top: a half-width button cut "Delete task" to "Delete ta..." on a real phone.
+  actions: { flexDirection: 'column-reverse' },
+  action: { alignSelf: 'stretch' },
 });

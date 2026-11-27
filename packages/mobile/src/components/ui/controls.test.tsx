@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Check, Plus } from '@/design/icons/lucide';
 import { act, fireEvent, screen } from '@testing-library/react-native';
-import { palette, typography } from '@/design';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { palette, ThemeProvider, typography } from '@/design';
 import { haptics, setHapticsEnabled } from '@/services/haptics';
 import { renderThemed, SCHEMES } from '@/test/renderThemed';
 import {
@@ -330,6 +331,20 @@ describe.each(SCHEMES)('controls in the %s theme', (scheme) => {
     });
   });
 
+  describe('Switch thumb', () => {
+    it('stays light in dark mode, where `surface` would vanish into the track', async () => {
+      await renderThemed(
+        <Switch value accessibilityLabel="Sync" onValueChange={() => undefined} />,
+        scheme,
+      );
+      // The host switch keeps the colour under a platform-specific prop name, so read it from the tree.
+      const tree = JSON.stringify(screen.toJSON());
+      const thumb = scheme === 'dark' ? colors.text : colors.surface;
+      expect(tree.toLowerCase()).toContain(thumb.toLowerCase());
+      if (scheme === 'dark') expect(tree.toLowerCase()).not.toContain(colors.surface.toLowerCase());
+    });
+  });
+
   describe('Slider', () => {
     it('is adjustable with a label and exposes its range and value', async () => {
       await renderThemed(
@@ -465,6 +480,41 @@ describe.each(SCHEMES)('controls in the %s theme', (scheme) => {
       );
       expect(screen.getByRole('header', { name: 'Sort by' })).toBeTruthy();
       expect(screen.getByRole('button', { name: 'Due date' })).toBeTruthy();
+    });
+  });
+
+  describe('Sheet visibility', () => {
+    it('renders nothing while hidden', async () => {
+      await renderThemed(
+        <Sheet visible={false} onClose={() => undefined} title="Sort by">
+          <Button label="Due date" />
+        </Sheet>,
+        scheme,
+      );
+      expect(screen.queryByText('Sort by')).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Due date' })).toBeNull();
+    });
+
+    it('shows its content when it becomes visible', async () => {
+      const ui = (visible: boolean) => (
+        <Sheet visible={visible} onClose={() => undefined} title="Sort by">
+          <Button label="Due date" />
+        </Sheet>
+      );
+      const view = await renderThemed(ui(false), scheme);
+      expect(screen.queryByText('Sort by')).toBeNull();
+      // Re-render the same tree with visible=true (the theme wrapper is kept by renderThemed).
+      await view.rerender(
+        <SafeAreaProvider
+          initialMetrics={{
+            frame: { x: 0, y: 0, width: 390, height: 844 },
+            insets: { top: 0, left: 0, right: 0, bottom: 0 },
+          }}
+        >
+          <ThemeProvider>{ui(true)}</ThemeProvider>
+        </SafeAreaProvider>,
+      );
+      expect(screen.getByRole('header', { name: 'Sort by' })).toBeTruthy();
     });
   });
 

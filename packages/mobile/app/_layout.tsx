@@ -1,7 +1,6 @@
 import { useMemo, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { Stack, ThemeProvider as NavigationThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SnackbarProvider } from '@/components/ui';
@@ -20,9 +19,7 @@ function ThemedShell({ children }: { children: ReactNode }) {
   return (
     <NavigationThemeProvider value={navigationTheme}>
       <StatusBar style={theme.isDark ? 'light' : 'dark'} />
-      <BottomSheetModalProvider>
-        <SnackbarProvider>{children}</SnackbarProvider>
-      </BottomSheetModalProvider>
+      <SnackbarProvider>{children}</SnackbarProvider>
     </NavigationThemeProvider>
   );
 }
